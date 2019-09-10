@@ -28,6 +28,41 @@ import java.util.List;
  */
 public class ReactViewPager extends ViewPager {
 
+  private FixedSpeedScroller mScroller = null;
+
+  private class FixedSpeedScroller extends Scroller {
+
+    private int mDuration = 2000;
+
+    public FixedSpeedScroller(Context context) {
+      super(context);
+    }
+
+    public FixedSpeedScroller(Context context, Interpolator interpolator) {
+      super(context, interpolator);
+    }
+
+    public FixedSpeedScroller(Context context, Interpolator interpolator, boolean flywheel) {
+      super(context, interpolator, flywheel);
+    }
+
+    @Override
+    public void startScroll(int startX, int startY, int dx, int dy, int duration) {
+      // Ignore received duration, use fixed one instead
+      super.startScroll(startX, startY, dx, dy, mDuration);
+    }
+
+    @Override
+    public void startScroll(int startX, int startY, int dx, int dy) {
+      // Ignore received duration, use fixed one instead
+      super.startScroll(startX, startY, dx, dy, mDuration);
+    }
+
+    public void setScrollDuration(int duration) {
+      mDuration = duration;
+    }
+  }
+
   private class Adapter extends PagerAdapter {
 
     private final List<View> mViews = new ArrayList<>();
@@ -147,10 +182,30 @@ public class ReactViewPager extends ViewPager {
 
   public ReactViewPager(ReactContext reactContext) {
     super(reactContext);
+    try {
+      Class<?> viewpager = ViewPager.class;
+      Field scroller = viewpager.getDeclaredField("mScroller");
+      scroller.setAccessible(true);
+      mScroller = new FixedSpeedScroller(getContext(),
+              new DecelerateInterpolator());
+      scroller.set(this, mScroller);
+      Log.d("testingSpeed--", mScroller);
+    } catch (Exception ignored) {
+      Log.d("testingSpeed--", "insideCatch");
+    }
+
+
     mEventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
     mIsCurrentItemFromJs = false;
     setOnPageChangeListener(new PageChangeListener());
     setAdapter(new Adapter());
+  }
+
+  /*
+   * Set the factor by which the duration will change
+   */
+  public void setScrollDuration(int duration) {
+    mScroller.setScrollDuration(duration);
   }
 
   @Override
