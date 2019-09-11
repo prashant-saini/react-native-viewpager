@@ -9,15 +9,22 @@ package com.reactnativecommunity.viewpager;
 
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Interpolator;
+import android.widget.Scroller;
+
 import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.common.ReactConstants;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.facebook.react.uimanager.events.NativeGestureUtil;
+
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,15 +41,15 @@ public class ReactViewPager extends ViewPager {
 
     private int mDuration = 2000;
 
-    public FixedSpeedScroller(Context context) {
+    public FixedSpeedScroller(ReactContext context) {
       super(context);
     }
 
-    public FixedSpeedScroller(Context context, Interpolator interpolator) {
+    public FixedSpeedScroller(ReactContext context, Interpolator interpolator) {
       super(context, interpolator);
     }
 
-    public FixedSpeedScroller(Context context, Interpolator interpolator, boolean flywheel) {
+    public FixedSpeedScroller(ReactContext context, Interpolator interpolator, boolean flywheel) {
       super(context, interpolator, flywheel);
     }
 
@@ -179,17 +186,21 @@ public class ReactViewPager extends ViewPager {
   private final EventDispatcher mEventDispatcher;
   private boolean mIsCurrentItemFromJs;
   private boolean mScrollEnabled = true;
+  private Field scrollertemp = null;
+  Field scroller;
 
   public ReactViewPager(ReactContext reactContext) {
     super(reactContext);
     try {
       Class<?> viewpager = ViewPager.class;
-      Field scroller = viewpager.getDeclaredField("mScroller");
+      scroller = viewpager.getDeclaredField("mScroller");
       scroller.setAccessible(true);
-      mScroller = new FixedSpeedScroller(getContext(),
+      scrollertemp = scroller;
+      mScroller = new FixedSpeedScroller(reactContext,
               new DecelerateInterpolator());
       scroller.set(this, mScroller);
-      Log.d("testingSpeed--", mScroller);
+      scroller = scrollertemp;
+      Log.d("testingSpeed--", mScroller.toString());
     } catch (Exception ignored) {
       Log.d("testingSpeed--", "insideCatch");
     }
