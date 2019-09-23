@@ -80,4 +80,6 @@ export default class ViewPagerAndroid extends ViewPagerAndroidBase {
      * The transition between pages will *not* be animated.
      */
     public setPageWithoutAnimation(selectedPage: number): void;
+    
+    public setScrollFactor(factor: number): void;
 }
