@@ -9,6 +9,7 @@ package com.reactnativecommunity.viewpager;
 
 import java.util.Map;
 
+import android.util.Log;
 import android.view.View;
 
 import com.facebook.infer.annotation.Assertions;
@@ -30,6 +31,7 @@ public class ReactViewPagerManager extends ViewGroupManager<ReactViewPager> {
 
   private static final int COMMAND_SET_PAGE = 1;
   private static final int COMMAND_SET_PAGE_WITHOUT_ANIMATION = 2;
+  private static final int COMMAND_SET_SCROLL_FACTOR = 3;
 
   @Override
   public String getName() {
@@ -65,7 +67,9 @@ public class ReactViewPagerManager extends ViewGroupManager<ReactViewPager> {
         "setPage",
         COMMAND_SET_PAGE,
         "setPageWithoutAnimation",
-        COMMAND_SET_PAGE_WITHOUT_ANIMATION);
+        COMMAND_SET_PAGE_WITHOUT_ANIMATION,
+        "setScrollFactor",
+        COMMAND_SET_SCROLL_FACTOR);
   }
 
   @Override
@@ -77,11 +81,17 @@ public class ReactViewPagerManager extends ViewGroupManager<ReactViewPager> {
     Assertions.assertNotNull(args);
     switch (commandType) {
       case COMMAND_SET_PAGE: {
+        Log.d("insideScrollfactor3--","setPage--");
         viewPager.setCurrentItemFromJs(args.getInt(0), true);
         return;
       }
       case COMMAND_SET_PAGE_WITHOUT_ANIMATION: {
         viewPager.setCurrentItemFromJs(args.getInt(0), false);
+        return;
+      }
+      case COMMAND_SET_SCROLL_FACTOR: {
+        Log.d("insideScrollfactor3--","--");
+        viewPager.setScrollFactor(args.getInt(0));
         return;
       }
       default:
