@@ -39,7 +39,7 @@ public class ReactViewPager extends ViewPager {
 
   private class FixedSpeedScroller extends Scroller {
 
-    private int mDuration = 2000;
+    private int mDurationFactor = 1;
 
     public FixedSpeedScroller(ReactContext context) {
       super(context);
@@ -56,17 +56,11 @@ public class ReactViewPager extends ViewPager {
     @Override
     public void startScroll(int startX, int startY, int dx, int dy, int duration) {
       // Ignore received duration, use fixed one instead
-      super.startScroll(startX, startY, dx, dy, mDuration);
+      super.startScroll(startX, startY, dx, dy,duration*mDurationFactor);
     }
 
-    @Override
-    public void startScroll(int startX, int startY, int dx, int dy) {
-      // Ignore received duration, use fixed one instead
-      super.startScroll(startX, startY, dx, dy, mDuration);
-    }
-
-    public void setScrollDuration(int duration) {
-      mDuration = duration;
+    public void setScrollFactor(int duration) {
+      mDurationFactor = duration;
     }
   }
 
@@ -195,11 +189,9 @@ public class ReactViewPager extends ViewPager {
       Class<?> viewpager = ViewPager.class;
       scroller = viewpager.getDeclaredField("mScroller");
       scroller.setAccessible(true);
-      scrollertemp = scroller;
       mScroller = new FixedSpeedScroller(reactContext,
               new DecelerateInterpolator());
       scroller.set(this, mScroller);
-      scroller = scrollertemp;
       Log.d("testingSpeed--", mScroller.toString());
     } catch (Exception ignored) {
       Log.d("testingSpeed--", "insideCatch");
@@ -215,8 +207,8 @@ public class ReactViewPager extends ViewPager {
   /*
    * Set the factor by which the duration will change
    */
-  public void setScrollDuration(int duration) {
-    mScroller.setScrollDuration(duration);
+  public void setScrollFactor(int factor) {
+    mScroller.setScrollFactor(factor);
   }
 
   @Override
