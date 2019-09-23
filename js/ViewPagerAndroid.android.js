@@ -267,6 +267,15 @@ class ViewPagerAndroid extends React.Component<Props> {
     );
   };
 
+setScrollFactor = (factor: number) => {
+      UIManager.dispatchViewManagerCommand(
+          ReactNative.findNodeHandle(this),
+          getViewManagerConfig('RNCViewPager').Commands
+              .setScrollFactor,
+          [factor],
+      );
+    };
+
   render() {
     return (
       <NativeAndroidViewPager
